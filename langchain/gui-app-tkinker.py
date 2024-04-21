@@ -94,11 +94,19 @@ program_combobox = ttk.Combobox(root, values=program_options,
 program_combobox.set("Wybierz program")
 program_combobox.pack(side=tk.TOP, fill=tk.X)
 
-text_area = tk.Text(root, height=15, font=default_font)
-text_area.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+text_frame = tk.Frame(root)
+text_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+text_area = tk.Text(text_frame, height=15, font=default_font)
+text_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+scrollbar = tk.Scrollbar(text_frame, command=text_area.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
 text_area.tag_configure("hyperlink", foreground="blue", underline=True)
 text_area.tag_configure("query", font=('helvetica', default_font_size, 'bold'))
 
+text_area.config(yscrollcommand=scrollbar.set)
 
 entry = tk.Entry(root, width=50)
 entry.pack(side=tk.BOTTOM, fill=tk.X)
