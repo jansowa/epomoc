@@ -5,6 +5,7 @@ import webbrowser
 from pathlib import Path
 from tkinter import ttk
 from epomoc_retriever import retrieve_documents
+from tkinter.font import Font
 
 # Create dataframe or load the existing one
 file_path = Path('prompts.csv')
@@ -39,14 +40,17 @@ def retrieve(event=None):
 
 def display_query_result(query, line, program, documents):
     index = len(df)
-    result_text = f"Pytanie: {query}\nLinia: {line}\nProgram: {program}\n{documents}\n"
+    # result_text = f"Pytanie: {query}\nLinia: {line}\nProgram: {program}\n{documents}\n"
+    query_text = f"Pytanie: {query}\n"
+    details_text = f"Linia: {line}\nProgram: {program}\n{documents}\n"
     start = text_area.index(tk.END)
-    text_area.insert(tk.END, result_text)
+    text_area.insert(tk.END, query_text, 'query')
+    text_area.insert(tk.END, details_text)
     end = text_area.index(tk.END)
     format_links(start, end)
     feedback_frame = tk.Frame(text_area)
-    positive_button = tk.Button(feedback_frame, text="+", command=lambda: update_feedback(index, 'Positive'))
-    negative_button = tk.Button(feedback_frame, text="-", command=lambda: update_feedback(index, 'Negative'))
+    positive_button = tk.Button(feedback_frame, text="+", command=lambda: update_feedback(index, 'Positive'), font=default_font)
+    negative_button = tk.Button(feedback_frame, text="-", command=lambda: update_feedback(index, 'Negative'), font=default_font)
     positive_button.pack(side=tk.LEFT)
     negative_button.pack(side=tk.LEFT)
     text_area.window_create(tk.END, window=feedback_frame)
@@ -71,24 +75,29 @@ def update_feedback(index, feedback):
 root = tk.Tk()
 root.title("RAG Query Interface")
 
-line_combobox = ttk.Combobox(root, values=["GT", "nexo"], state="readonly")
+default_font_size = 20
+default_font = Font(family="helvetica", size=default_font_size)
+
+line_combobox = ttk.Combobox(root, values=["GT", "nexo"], state="readonly", font=default_font)
 line_combobox.set("Wybierz linię")
 line_combobox.pack(side=tk.TOP, fill=tk.X)
 
 program_combobox = ttk.Combobox(root, values=["Subiekt", "Subiekt 123", "Gratyfikant", "Rachmistrz", "Rewizor"],
-                                state="readonly")
+                                state="readonly", font=default_font)
 program_combobox.set("Wybierz program")
 program_combobox.pack(side=tk.TOP, fill=tk.X)
 
-text_area = tk.Text(root, height=15)
+text_area = tk.Text(root, height=15, font=default_font)
 text_area.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 text_area.tag_configure("hyperlink", foreground="blue", underline=True)
+text_area.tag_configure("query", font=('helvetica', default_font_size, 'bold'))
+
 
 entry = tk.Entry(root, width=50)
 entry.pack(side=tk.BOTTOM, fill=tk.X)
 entry.bind("<Return>", retrieve)
 
-search_button = tk.Button(root, text="Wyślij", command=retrieve)
+search_button = tk.Button(root, text="Wyślij", command=retrieve, font=default_font)
 search_button.pack(side=tk.BOTTOM)
 
 root.mainloop()
