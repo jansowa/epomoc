@@ -6,6 +6,7 @@ from pathlib import Path
 from tkinter import ttk
 from epomoc_retriever import retrieve_documents
 from tkinter.font import Font
+from typing import Final
 
 # Create dataframe or load the existing one
 file_path = Path('prompts.csv')
@@ -14,6 +15,7 @@ if file_path.exists():
 else:
     df = pd.DataFrame(columns=['Query', 'Documents', 'Line', 'Program', 'UserFeedback'])
 
+EMPTY_COMBOBOX_CHOICE: Final[str] = "Wszystkie"
 
 def open_url(url):
     webbrowser.open(url, new=2)  # Open link in new tab
@@ -31,7 +33,11 @@ def format_links(start, end):
 def retrieve(event=None):
     query = entry.get()
     line = line_combobox.get()
+    if line == EMPTY_COMBOBOX_CHOICE:
+        line = None
     program = program_combobox.get()
+    if program == EMPTY_COMBOBOX_CHOICE:
+        program = None
     documents = retrieve_documents(query)
     display_query_result(query, line, program, documents)
     entry.delete(0, tk.END)
@@ -40,7 +46,6 @@ def retrieve(event=None):
 
 def display_query_result(query, line, program, documents):
     index = len(df)
-    # result_text = f"Pytanie: {query}\nLinia: {line}\nProgram: {program}\n{documents}\n"
     query_text = f"Pytanie: {query}\n"
     details_text = f"Linia: {line}\nProgram: {program}\n{documents}\n"
     start = text_area.index(tk.END)
@@ -78,11 +83,13 @@ root.title("RAG Query Interface")
 default_font_size = 20
 default_font = Font(family="helvetica", size=default_font_size)
 
-line_combobox = ttk.Combobox(root, values=["GT", "nexo"], state="readonly", font=default_font)
+line_options = [EMPTY_COMBOBOX_CHOICE, "GT", "nexo"]
+line_combobox = ttk.Combobox(root, values=line_options, state="readonly", font=default_font)
 line_combobox.set("Wybierz linię")
 line_combobox.pack(side=tk.TOP, fill=tk.X)
 
-program_combobox = ttk.Combobox(root, values=["Subiekt", "Subiekt 123", "Gratyfikant", "Rachmistrz", "Rewizor"],
+program_options = [EMPTY_COMBOBOX_CHOICE, "Subiekt", "Subiekt 123", "Gratyfikant", "Rachmistrz", "Rewizor"]
+program_combobox = ttk.Combobox(root, values=program_options,
                                 state="readonly", font=default_font)
 program_combobox.set("Wybierz program")
 program_combobox.pack(side=tk.TOP, fill=tk.X)
